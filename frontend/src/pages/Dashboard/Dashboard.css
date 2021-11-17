@@ -1,0 +1,23 @@
+.dashboard_header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 2rem 2rem;
+}
+
+.update_delete_icons {
+  margin: 0 10px;
+
+  cursor: pointer;
+}
+
+.image_label {
+  border: "1px black solid";
+  padding: "8px";
+  border-radius: "8px";
+  display: "inline-block";
+  float: "left";
+  cursor: "pointer";
+  width: "20%";
+  margin-top: "1rem";
+}

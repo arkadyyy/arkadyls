@@ -1,0 +1,21 @@
+version: "3"
+
+services:
+  backend:
+    env_file: "./backend/.env"
+    build:
+      context: ./backend
+      dockerfile: ./Dockerfile
+    image: "arkadyyy/arkadyls-backend"
+    ports:
+      - "9999:9999"
+  frontend:
+    env_file: "./frontend/.env"
+    build:
+      context: ./frontend
+      dockerfile: ./Dockerfile
+    image: "arkadyyy/arkadyls-frontend"
+    ports:
+      - "80:3000"
+    links:
+      - "backend"

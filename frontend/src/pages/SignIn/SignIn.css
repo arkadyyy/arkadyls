@@ -1,0 +1,25 @@
+.signInContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+
+  align-items: center;
+  background-color: #f4f4f4;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.language_select {
+  position: relative;
+  top: "-240px";
+  left: "50px";
+}
+
+.sign_in_pic {
+  border-radius: 50%;
+  width: 100px;
+  height: 100px;
+  position: relative;
+  top: -5rem;
+  margin: 0 auto;
+}
