@@ -151,7 +151,8 @@ const SignIn = withRouter(({ history }) => {
               </Button>
               <FacebookLogin
                 size={"small"}
-                appId={process.env.REACT_APP_FACEBOOK_ACCESS_KEY}
+                // appId={process.env.REACT_APP_FACEBOOK_ACCESS_KEY}
+                appId={"309075364038210"}
                 fields='name,email,picture'
                 callback={responseFacebook}
               />
