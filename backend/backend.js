@@ -16,7 +16,13 @@ const app = express();
 dotenv.config();
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors({ credentials: true, origin: "http://localhost:3000" }));
+// app.use(cors({ credentials: true, origin: "http://localhost:3000" }));
+app.use(
+  cors({
+    credentials: true,
+    origin: "http://ec2-3-86-138-22.compute-1.amazonaws.com",
+  })
+);
 
 app.use(user_router);
 app.use(auth_router);

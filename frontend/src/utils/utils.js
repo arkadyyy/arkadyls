@@ -1,4 +1,6 @@
-export const BASE_API_URL = "http://localhost:9999/api";
+// export const BASE_API_URL = "http://localhost:9999/api";
+export const BASE_API_URL =
+  "http://ec2-3-86-138-22.compute-1.amazonaws.com:9999/api";
 
 export const signText = {
   EN: {
