@@ -12,12 +12,16 @@
 }
 
 .image_label {
-  border: "1px black solid";
-  padding: "8px";
-  border-radius: "8px";
-  display: "inline-block";
-  float: "left";
-  cursor: "pointer";
-  width: "20%";
-  margin-top: "1rem";
+  border-radius: 9px;
+  color: grey;
+  padding: 3px 8px;
+  background-color: #f4f4f4;
+  cursor: pointer;
+}
+
+.form_select {
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  border-bottom: 1px solid lightslategray;
 }

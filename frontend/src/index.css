@@ -43,3 +43,13 @@ input[type="file"] {
   opacity: 0;
   transition: all 250ms linear 2s !important;
 }
+
+.alert-fixed {
+  position: fixed !important;
+  top: 90px !important;
+  right: 10px !important;
+  width: 30% !important;
+  z-index: 9999 !important;
+  margin: 0 auto !important;
+  border-radius: 0px;
+}

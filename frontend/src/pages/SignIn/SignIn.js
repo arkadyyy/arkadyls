@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { BASE_API_URL } from "../../utils/utils";
 import axios from "axios";
 import user_pic from "../../images/user.png";
 import Button from "react-bootstrap/Button";
@@ -34,7 +35,7 @@ const SignIn = withRouter(({ history }) => {
       image: res.picture.data.url,
     };
     axios
-      .post("http://localhost:9999/api/facebook_sign_in", data, {
+      .post(`${BASE_API_URL}/facebook_sign_in`, data, {
         withCredentials: true,
       })
       .then((res) => {
@@ -52,7 +53,7 @@ const SignIn = withRouter(({ history }) => {
   const handleSubmit = (e, data) => {
     e.preventDefault();
     axios
-      .post("http://localhost:9999/api/sign_in", data, {
+      .post(`${BASE_API_URL}/sign_in`, data, {
         withCredentials: true,
         "Content-Type": "application/json",
       })
@@ -94,7 +95,7 @@ const SignIn = withRouter(({ history }) => {
             value={language}
             style={{
               position: "relative",
-              top: "12rem",
+              top: "10rem",
               left: "19rem",
               padding: "0.3rem",
             }}
@@ -105,9 +106,13 @@ const SignIn = withRouter(({ history }) => {
             <option value='HE'>HE</option>
           </Form.Select>{" "}
         </div>
-        {displayError ? <Alert variant={"danger"}>{errMsg}</Alert> : null}
+        {displayError ? (
+          <Alert className='alert-fixed' variant={"danger"}>
+            {errMsg}
+          </Alert>
+        ) : null}
 
-        <h2 style={{ marginTop: "3rem", marginBottom: "5rem" }}>
+        <h2 style={{ marginTop: "1rem", marginBottom: "5rem" }}>
           {signText[language]["signIn"]["header"]}
         </h2>
 
@@ -169,17 +174,6 @@ const SignIn = withRouter(({ history }) => {
         >
           {signText[language]["signIn"]["signUp"]}
         </a>
-
-        <p
-          style={{
-            marginTop: "2rem",
-            fontSize: "12px",
-            borderBottom: "1px solid black",
-            fontWeight: "bold",
-          }}
-        >
-          Our Terms of Use and Privacy Policy
-        </p>
       </div>
     </>
   );

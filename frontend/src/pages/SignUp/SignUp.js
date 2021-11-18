@@ -6,10 +6,11 @@ import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
 import Form from "react-bootstrap/Form";
 import Alert from "react-bootstrap/Alert";
+import Spinner from "react-bootstrap/Spinner";
 import { withRouter, Redirect } from "react-router-dom";
 import { Plus } from "react-bootstrap-icons";
 import NavBar from "../../components/Navbar";
-import { signText } from "../../utils/utils";
+import { signText, BASE_API_URL } from "../../utils/utils";
 import { languageChange } from "../../Redux/action";
 import { useSelector, useDispatch } from "react-redux";
 import FormComponent from "./Form";
@@ -28,6 +29,8 @@ const SignUp = withRouter(({ history }) => {
 
   const [image, setimage] = useState(null);
   const [language, setlanguage] = useState("EN");
+
+  const [displayImageLoader, setdisplayImageLoader] = useState(false);
 
   const inputUpdateAvatarPhoto = useRef(null);
 
@@ -72,7 +75,7 @@ const SignUp = withRouter(({ history }) => {
     e.preventDefault();
 
     axios
-      .post("http://localhost:9999/api/sign_up", data, {
+      .post(`${BASE_API_URL}/sign_up`, data, {
         withCredentials: true,
         "Content-Type": "application/json",
       })
@@ -80,7 +83,6 @@ const SignUp = withRouter(({ history }) => {
         history.push("/sign_in");
       })
       .catch((err) => {
-        console.log(err.message);
         seterrMsg(err.message);
         setshowErr(true);
       });
@@ -88,9 +90,8 @@ const SignUp = withRouter(({ history }) => {
 
   const imageUpload = () => {
     const image = inputUpdateAvatarPhoto.current?.files[0];
-
-    axios.get("http://localhost:9999/api/s3_url").then(async (res) => {
-      console.log("res 1 :", res.data.url);
+    setdisplayImageLoader(true);
+    axios.get(`${BASE_API_URL}/s3_url`).then(async (res) => {
       await fetch(res.data.url, {
         method: "PUT",
         headers: {
@@ -102,6 +103,7 @@ const SignUp = withRouter(({ history }) => {
         let url = res.url.split("?")[0];
 
         setimage(url);
+        setdisplayImageLoader(false);
       });
     });
   };
@@ -133,7 +135,11 @@ const SignUp = withRouter(({ history }) => {
             <option value='HE'>HE</option>
           </Form.Select>{" "}
         </div>
-        {showErr && <Alert variant={"danger"}>{errMsg}</Alert>}
+        {showErr && (
+          <Alert className='alert-fixed' variant={"danger"}>
+            {errMsg}
+          </Alert>
+        )}
         <h2 style={{ margin: "3rem 0" }}>
           {" "}
           {signText[language]["signUp"]["header"]}
@@ -174,7 +180,12 @@ const SignUp = withRouter(({ history }) => {
                   });
               }}
             >
-              <h6 style={{ position: "relative", right: "12rem" }}>
+              <h6
+                style={{
+                  position: "relative",
+                  right: dir === "ltr" ? "12rem" : "-12rem",
+                }}
+              >
                 {" "}
                 {signText[language]["signUp"]["personalDetails"]}
               </h6>
@@ -201,7 +212,7 @@ const SignUp = withRouter(({ history }) => {
               <h6
                 style={{
                   position: "relative",
-                  right: "13.4rem",
+                  right: dir === "ltr" ? "13.7rem" : "-13.7rem",
                   marginTop: "2rem",
                 }}
               >
@@ -225,10 +236,15 @@ const SignUp = withRouter(({ history }) => {
 
               <Button
                 style={{ marginTop: "1rem" }}
-                variant='primary'
                 type='submit'
+                disabled={displayImageLoader}
+                variant='primary'
               >
-                {signText[language]["signUp"]["header"]}
+                {displayImageLoader ? (
+                  <Spinner size='sm' animation='border' />
+                ) : (
+                  signText[language]["signUp"]["header"]
+                )}
               </Button>
             </Form>
           </Card.Body>

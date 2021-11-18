@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { BASE_API_URL } from "../../utils/utils";
 import axios from "axios";
 import Cookies from "js-cookie";
 import jwt_decode from "jwt-decode";
@@ -40,7 +41,7 @@ const Dashboard = ({ history }) => {
     console.log(email);
     console.log(decoded_jwt);
     axios
-      .delete("http://localhost:9999/api/delete_user", {
+      .delete(`${BASE_API_URL}/delete_user`, {
         data: {
           _id,
         },
@@ -49,21 +50,75 @@ const Dashboard = ({ history }) => {
         if (decoded_jwt.email === email) {
           Cookies.remove("jwt");
           history.push("/");
-          console.log("res in if", res);
         } else {
-          console.log("res in else", res);
           dispatch(getAllUsers(res.data));
         }
-
-        console.log("data : ~", res.data);
       });
   };
 
   useEffect(() => {
     axios
-      .get("http://localhost:9999/api/all_users")
+      .get(`${BASE_API_URL}/all_users`)
       .then((res) => dispatch(getAllUsers(res.data)));
   }, []);
+
+  const TableHead = () => {
+    return (
+      <thead>
+        <tr>
+          <th></th>
+          <th>First Name</th>
+          <th>Last Name</th>
+          <th>Phone</th>
+          <th>Address</th>
+          <th>Roll</th>
+          <th>Start Date</th>
+          {decoded_jwt.is_admin && <th></th>}
+        </tr>
+      </thead>
+    );
+  };
+
+  const TableRow = ({ user }) => {
+    return (
+      <tr key={user._id}>
+        <td>
+          <Image
+            style={{
+              width: "70px",
+              height: "70px",
+              objectFit: "cover",
+              borderRadius: "50%",
+            }}
+            src={user.profile_pic === "" ? user_pic : user.profile_pic}
+          />
+        </td>
+        <td>{user.firstName}</td>
+        <td>{user.lastName}</td>
+        <td>{user.phone}</td>
+        <td>{user.address}</td>
+        <td>{user.roll}</td>
+        <td>{user.createdAt.split("T")[0]}</td>
+        {decoded_jwt.is_admin && (
+          <>
+            <td>
+              <Pencil
+                className='update_delete_icons'
+                onClick={() => {
+                  setupdatedUser(users.find((obj) => obj._id === user._id));
+                  setshowUpdateUser(true);
+                }}
+              />
+              <Trash
+                className='update_delete_icons'
+                onClick={() => handleDeleteUser(user._id, user.email)}
+              />
+            </td>
+          </>
+        )}
+      </tr>
+    );
+  };
 
   return (
     <>
@@ -82,66 +137,10 @@ const Dashboard = ({ history }) => {
               </Button>
             </div>
             <Table hover>
-              <thead>
-                <tr>
-                  <th></th>
-                  <th>First Name</th>
-                  <th>Last Name</th>
-                  <th>Phone</th>
-                  <th>Adress</th>
-                  <th>Roll</th>
-                  <th>Start Date</th>
-                  {decoded_jwt.is_admin && <th></th>}
-                </tr>
-              </thead>
+              <TableHead />
               <tbody>
                 {users.map((user) => (
-                  <tr key={user._id}>
-                    <td>
-                      <Image
-                        style={{
-                          width: "70px",
-                          height: "70px",
-                          objectFit: "contain",
-                          borderRadius: "50%",
-                        }}
-                        src={
-                          user.profile_pic === "" ? user_pic : user.profile_pic
-                        }
-                      />
-                    </td>
-                    <td>{user.firstName}</td>
-                    <td>{user.lastName}</td>
-                    <td>{user.phone}</td>
-                    <td>{user.address}</td>
-                    <td>{user.roll}</td>
-                    <td>{user.createdAt.split("T")[0]}</td>
-                    {decoded_jwt.is_admin && (
-                      <>
-                        <td>
-                          <Pencil
-                            className='update_delete_icons'
-                            onClick={() => {
-                              console.log(
-                                "~~~",
-                                users.find((obj) => obj._id === user._id)
-                              );
-                              setupdatedUser(
-                                users.find((obj) => obj._id === user._id)
-                              );
-                              setshowUpdateUser(true);
-                            }}
-                          />
-                          <Trash
-                            className='update_delete_icons'
-                            onClick={() =>
-                              handleDeleteUser(user._id, user.email)
-                            }
-                          />
-                        </td>
-                      </>
-                    )}
-                  </tr>
+                  <TableRow user={user} />
                 ))}
               </tbody>
             </Table>

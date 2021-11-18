@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
+import { BASE_API_URL } from "../../../utils/utils";
 import axios from "axios";
 import Modal from "react-bootstrap/Modal";
 import Alert from "react-bootstrap/Alert";
@@ -6,7 +7,9 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import { useSelector, useDispatch } from "react-redux";
 import { getAllUsers } from "../../../Redux/action";
-
+import { XLg } from "react-bootstrap-icons";
+import user_pic from "../../../images/user.png";
+import Spinner from "react-bootstrap/Spinner";
 const AddUser = (props) => {
   const inputUpdateAvatarPhoto = useRef(null);
 
@@ -21,8 +24,10 @@ const AddUser = (props) => {
   const [image, setimage] = useState("");
 
   const [displayError, setdisplayError] = useState(false);
-  const [errMsg, seterrMsg] = useState("test");
+  const [errMsg, seterrMsg] = useState("");
   const [displaySuccess, setdisplaySuccess] = useState(false);
+
+  const [displayImageLoader, setdisplayImageLoader] = useState(false);
 
   const resetData = () => {
     setfirstName("");
@@ -34,11 +39,21 @@ const AddUser = (props) => {
     setimage("");
   };
 
+  const checkFields = (e) => {
+    e.preventDefault();
+    if (firstName === "" || lastName === "" || email === "") {
+      seterrMsg("First name, Last name and Email must be filled");
+      setdisplayError(true);
+      return false;
+    } else {
+      return true;
+    }
+  };
+
   const imageUpload = () => {
     const image = inputUpdateAvatarPhoto.current?.files[0];
-
-    axios.get("http://localhost:9999/api/s3_url").then(async (res) => {
-      console.log("res 1 :", res.data.url);
+    setdisplayImageLoader(true);
+    axios.get(`${BASE_API_URL}/s3_url`).then(async (res) => {
       await fetch(res.data.url, {
         method: "PUT",
         headers: {
@@ -48,13 +63,14 @@ const AddUser = (props) => {
         body: image,
       }).then((res) => {
         let url = res.url.split("?")[0];
-
         setimage(url);
+        setdisplayImageLoader(false);
       });
     });
   };
 
-  const addNewUser = () => {
+  const addNewUser = (e) => {
+    e.preventDefault();
     const data = {
       firstName,
       lastName,
@@ -66,7 +82,7 @@ const AddUser = (props) => {
     };
     console.log(data);
     axios
-      .post("http://localhost:9999/api/new_user", data)
+      .post(`${BASE_API_URL}/new_user`, data)
       .then((res) => {
         dispatch(getAllUsers(res.data));
         resetData();
@@ -75,15 +91,14 @@ const AddUser = (props) => {
       .catch((err) => {
         seterrMsg(err.message);
         setdisplayError(true);
-        console.log(err.message);
       });
   };
 
   useEffect(() => {
     setTimeout(() => {
       setdisplayError(false);
+      seterrMsg("");
     }, 3000);
-    seterrMsg("");
   }, [displayError]);
   useEffect(() => {
     setTimeout(() => {
@@ -94,16 +109,75 @@ const AddUser = (props) => {
   return (
     <Modal
       {...props}
-      size='lg'
+      size='md'
       aria-labelledby='contained-modal-title-vcenter'
       centered
     >
-      <Modal.Header closeButton>
+      <Modal.Header>
         <Modal.Title id='contained-modal-title-vcenter'>Add User</Modal.Title>
+        <XLg cursor='pointer' onClick={props.onHide} />
       </Modal.Header>
       <Modal.Body>
-        <Form>
-          <Form.Group className='mb-3 border-bottom '>
+        {displayError ? (
+          <Alert className='alert-fixed' variant={"danger"}>
+            {errMsg}
+          </Alert>
+        ) : (
+          <div></div>
+        )}
+        {displaySuccess ? (
+          <Alert className='alert-fixed' variant={"success"}>
+            {"User Created Successfully"}
+          </Alert>
+        ) : (
+          <div></div>
+        )}
+        <Form
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+          onSubmit={(e) => checkFields(e) && addNewUser(e)}
+        >
+          <div
+            style={{
+              display: "flex",
+              position: "relative",
+              right: "20px",
+              width: "300px",
+              marginBottom: "30px",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <img
+              style={{
+                width: "50px",
+                height: "50px",
+                borderRadius: "50%",
+                objectFit: "cover",
+              }}
+              src={image ? image : user_pic}
+            />
+            <div className='image_label'>
+              <label>
+                <Form.Control
+                  id='fileUpload'
+                  type='file'
+                  accept='.jpg'
+                  onChange={imageUpload}
+                  ref={inputUpdateAvatarPhoto}
+                />
+                Add profile pic
+              </label>
+            </div>
+          </div>
+          <Form.Group
+            style={{ minWidth: "300px" }}
+            className='mb-3 border-bottom '
+          >
+            <Form.Label style={{ fontSize: "14px" }}>First Name</Form.Label>
             <Form.Control
               size='sm'
               value={firstName}
@@ -114,7 +188,11 @@ const AddUser = (props) => {
               placeholder='First Name'
             />
           </Form.Group>
-          <Form.Group className='mb-3 border-bottom'>
+          <Form.Group
+            style={{ minWidth: "300px" }}
+            className='mb-3 border-bottom'
+          >
+            <Form.Label>Last Name</Form.Label>
             <Form.Control
               size='sm'
               value={lastName}
@@ -125,7 +203,11 @@ const AddUser = (props) => {
               placeholder='Last Name'
             />
           </Form.Group>
-          <Form.Group className='mb-3 border-bottom'>
+          <Form.Group
+            style={{ minWidth: "300px" }}
+            className='mb-3 border-bottom'
+          >
+            <Form.Label>Email</Form.Label>
             <Form.Control
               size='sm'
               value={email}
@@ -136,18 +218,27 @@ const AddUser = (props) => {
               placeholder='Email'
             />
           </Form.Group>
-          <Form.Group className='mb-3 border-bottom'>
+          <Form.Group
+            style={{ minWidth: "300px" }}
+            className='mb-3 border-bottom'
+          >
+            <Form.Label>Phone</Form.Label>
             <Form.Control
               size='sm'
               value={phone}
               onChange={(e) => {
                 setphone(e.target.value);
               }}
-              type='text'
+              type='tel'
+              pattern='[0-9]{3}[0-9]{3}[0-9]{4}'
               placeholder='Phone'
             />
           </Form.Group>
-          <Form.Group className='mb-3 border-bottom'>
+          <Form.Group
+            style={{ minWidth: "300px" }}
+            className='mb-3 border-bottom'
+          >
+            <Form.Label>Address</Form.Label>
             <Form.Control
               size='sm'
               value={address}
@@ -158,10 +249,23 @@ const AddUser = (props) => {
               placeholder='Address'
             />
           </Form.Group>
-          <Form.Group className='mb-3 '>
+          <Form.Group
+            style={{
+              minWidth: "300px",
+              display: "flex",
+              flexDirection: "column",
+            }}
+            className='mb-3 '
+          >
             <Form.Label style={{ marginRight: "30px" }}>Roll</Form.Label>
-            <Form.Select onChange={(e) => setroll(e.target.value)}>
+            <Form.Select
+              className='form_select'
+              value={roll}
+              onChange={(e) => setroll(e.target.value)}
+            >
+              <option value=''>not selected</option>
               <option value='HR'>HR</option>
+
               <option value='UX/UI'>UX/UI</option>
               <option value='Frontend'>Frontend</option>
               <option value='Backend'>Backend</option>
@@ -171,43 +275,17 @@ const AddUser = (props) => {
               <option value='Devops'>Devops</option>
             </Form.Select>
           </Form.Group>
-          <label>
-            <Form.Control
-              id='fileUpload'
-              type='file'
-              accept='.jpg'
-              onChange={imageUpload}
-              ref={inputUpdateAvatarPhoto}
-              //   style={{ display: "none" }}
-              // className='custom-file-input'
-              style={{ cursor: "pointer !important", padding: "1rem" }}
-            />
-            add profile pic
-          </label>
+
+          {}
+          <Button type='submit' disabled={displayImageLoader} variant='success'>
+            {displayImageLoader ? (
+              <Spinner size='sm' animation='border' />
+            ) : (
+              "Add User"
+            )}
+          </Button>
         </Form>
       </Modal.Body>
-      <Modal.Footer
-        style={{ display: "flex", justifyContent: "space-between" }}
-      >
-        {displayError ? (
-          <Alert variant={"danger"}>{"User alraedy exsits"}</Alert>
-        ) : (
-          <div></div>
-        )}
-        {displaySuccess ? (
-          <Alert variant={"success"}>{"User Created Successfully"}</Alert>
-        ) : (
-          <div></div>
-        )}
-        <div>
-          <Button variant='light' onClick={props.onHide}>
-            Close
-          </Button>
-          <Button onClick={addNewUser} variant='success'>
-            Add User
-          </Button>
-        </div>
-      </Modal.Footer>
     </Modal>
   );
 };

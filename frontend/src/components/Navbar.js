@@ -6,6 +6,7 @@ import Image from "react-bootstrap/Image";
 import { withRouter } from "react-router-dom";
 import jwt_decode from "jwt-decode";
 import { BoxArrowRight } from "react-bootstrap-icons";
+import user_pic from "../images/user.png";
 
 const NavBar = withRouter(({ page = "not_dashboard", history }) => {
   const decoded_jwt = Cookies.get("jwt")
@@ -27,10 +28,14 @@ const NavBar = withRouter(({ page = "not_dashboard", history }) => {
               style={{
                 width: "40px",
                 height: "40px",
-                objectFit: "contain",
+                objectFit: "cover",
                 margin: "0 7px",
               }}
-              src={decoded_jwt.profile_pic}
+              src={
+                decoded_jwt.profile_pic === ""
+                  ? user_pic
+                  : decoded_jwt.profile_pic
+              }
             />
             <Navbar.Text href='#'>{decoded_jwt.firstName}</Navbar.Text>
 
