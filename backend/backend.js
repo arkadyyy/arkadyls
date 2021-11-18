@@ -27,6 +27,10 @@ app.use(
 app.use(user_router);
 app.use(auth_router);
 
+app.get("/", (req, res) => {
+  res.send("shalom !");
+});
+
 app.get("/api/s3_url", async (req, res) => {
   const url = await generateUploadURL();
   res.send({ url });
