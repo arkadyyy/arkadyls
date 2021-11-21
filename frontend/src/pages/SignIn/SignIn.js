@@ -3,6 +3,8 @@ import { BASE_API_URL } from "../../utils/utils";
 import axios from "axios";
 import user_pic from "../../images/user.png";
 import Button from "react-bootstrap/Button";
+import InputGroup from "react-bootstrap/InputGroup";
+import FormControl from "react-bootstrap/FormControl";
 import Card from "react-bootstrap/Card";
 import Form from "react-bootstrap/Form";
 import Alert from "react-bootstrap/Alert";
@@ -14,6 +16,7 @@ import "./SignIn.css";
 import NavBar from "../../components/Navbar";
 import { signText } from "../../utils/utils";
 import FormComponent from "./Form";
+import { Eye } from "react-bootstrap-icons";
 const SignIn = withRouter(({ history }) => {
   const dir = useSelector((state) => state.dir);
   const dispatch = useDispatch();
@@ -21,6 +24,7 @@ const SignIn = withRouter(({ history }) => {
   const [password, setpassword] = useState("");
   const [displayError, setdisplayError] = useState(false);
   const [errMsg, seterrMsg] = useState("");
+  const [displayPass, setdisplayPass] = useState(false);
 
   const [language, setlanguage] = useState("EN");
 
@@ -143,7 +147,13 @@ const SignIn = withRouter(({ history }) => {
                   setValue: setpassword,
                 },
               ].map((obj, id) => (
-                <FormComponent key={id} {...obj} language={language} />
+                <FormComponent
+                  displayPass={displayPass}
+                  setdisplayPass={setdisplayPass}
+                  key={id}
+                  {...obj}
+                  language={language}
+                />
               ))}
 
               <Button variant='primary' className='m-2' type='submit'>

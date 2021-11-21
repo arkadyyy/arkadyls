@@ -31,6 +31,10 @@ const SignUp = withRouter(({ history }) => {
   const [language, setlanguage] = useState("EN");
 
   const [displayImageLoader, setdisplayImageLoader] = useState(false);
+  const [displayPass, setdisplayPass] = useState({
+    Password: false,
+    RetypePassword: false,
+  });
 
   const inputUpdateAvatarPhoto = useRef(null);
 
@@ -206,7 +210,13 @@ const SignUp = withRouter(({ history }) => {
                   setValue: setemail,
                 },
               ].map((obj, id) => (
-                <FormComponent key={id} {...obj} language={language} />
+                <FormComponent
+                  displayPass={displayPass}
+                  setdisplayPass={setdisplayPass}
+                  key={id}
+                  {...obj}
+                  language={language}
+                />
               ))}
 
               <h6
@@ -231,7 +241,13 @@ const SignUp = withRouter(({ history }) => {
                   setValue: setpasswordRe,
                 },
               ].map((obj, id) => (
-                <FormComponent key={id} {...obj} language={language} />
+                <FormComponent
+                  displayPass={displayPass}
+                  setdisplayPass={setdisplayPass}
+                  key={id}
+                  {...obj}
+                  language={language}
+                />
               ))}
 
               <Button
